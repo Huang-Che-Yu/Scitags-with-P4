@@ -38,21 +38,17 @@
       ]
     },
     {
-      "name" : "ipv4_t",
+      "name" : "ipv6_t",
       "id" : 3,
       "fields" : [
         ["version", 4, false],
-        ["ihl", 4, false],
-        ["diffserv", 8, false],
-        ["totalLen", 16, false],
-        ["identification", 16, false],
-        ["flags", 3, false],
-        ["fragOffset", 13, false],
-        ["ttl", 8, false],
-        ["protocol", 8, false],
-        ["hdrChecksum", 16, false],
-        ["srcAddr", 32, false],
-        ["dstAddr", 32, false]
+        ["trafficClass", 8, false],
+        ["flowLabel", 20, false],
+        ["payloadLength", 16, false],
+        ["nextHeader", 8, false],
+        ["hopLimit", 8, false],
+        ["srcAddr", 128, false],
+        ["dstAddr", 128, false]
       ]
     }
   ],
@@ -79,9 +75,9 @@
       "pi_omit" : true
     },
     {
-      "name" : "ipv4",
+      "name" : "ipv6",
       "id" : 3,
-      "header_type" : "ipv4_t",
+      "header_type" : "ipv6_t",
       "metadata" : false,
       "pi_omit" : true
     }
@@ -124,9 +120,9 @@
           "transitions" : [
             {
               "type" : "hexstr",
-              "value" : "0x0800",
+              "value" : "0x86dd",
               "mask" : null,
-              "next_state" : "parse_ipv4"
+              "next_state" : "parse_ipv6"
             },
             {
               "type" : "default",
@@ -143,14 +139,14 @@
           ]
         },
         {
-          "name" : "parse_ipv4",
+          "name" : "parse_ipv6",
           "id" : 1,
           "parser_ops" : [
             {
               "parameters" : [
                 {
                   "type" : "regular",
-                  "value" : "ipv4"
+                  "value" : "ipv6"
                 }
               ],
               "op" : "extract"
@@ -175,77 +171,19 @@
       "name" : "deparser",
       "id" : 0,
       "source_info" : {
-        "filename" : "basic.p4",
-        "line" : 147,
+        "filename" : "ipv6.p4",
+        "line" : 128,
         "column" : 8,
         "source_fragment" : "MyDeparser"
       },
-      "order" : ["ethernet", "ipv4"],
+      "order" : ["ethernet", "ipv6"],
       "primitives" : []
     }
   ],
   "meter_arrays" : [],
   "counter_arrays" : [],
   "register_arrays" : [],
-  "calculations" : [
-    {
-      "name" : "calc",
-      "id" : 0,
-      "source_info" : {
-        "filename" : "basic.p4",
-        "line" : 125,
-        "column" : 8,
-        "source_fragment" : "update_checksum( ..."
-      },
-      "algo" : "csum16",
-      "input" : [
-        {
-          "type" : "field",
-          "value" : ["ipv4", "version"]
-        },
-        {
-          "type" : "field",
-          "value" : ["ipv4", "ihl"]
-        },
-        {
-          "type" : "field",
-          "value" : ["ipv4", "diffserv"]
-        },
-        {
-          "type" : "field",
-          "value" : ["ipv4", "totalLen"]
-        },
-        {
-          "type" : "field",
-          "value" : ["ipv4", "identification"]
-        },
-        {
-          "type" : "field",
-          "value" : ["ipv4", "flags"]
-        },
-        {
-          "type" : "field",
-          "value" : ["ipv4", "fragOffset"]
-        },
-        {
-          "type" : "field",
-          "value" : ["ipv4", "ttl"]
-        },
-        {
-          "type" : "field",
-          "value" : ["ipv4", "protocol"]
-        },
-        {
-          "type" : "field",
-          "value" : ["ipv4", "srcAddr"]
-        },
-        {
-          "type" : "field",
-          "value" : ["ipv4", "dstAddr"]
-        }
-      ]
-    }
-  ],
+  "calculations" : [],
   "learn_lists" : [],
   "actions" : [
     {
@@ -268,8 +206,8 @@
             }
           ],
           "source_info" : {
-            "filename" : "basic.p4",
-            "line" : 83,
+            "filename" : "ipv6.p4",
+            "line" : 78,
             "column" : 8,
             "source_fragment" : "mark_to_drop(standard_metadata)"
           }
@@ -277,7 +215,7 @@
       ]
     },
     {
-      "name" : "MyIngress.ipv4_forward",
+      "name" : "MyIngress.ipv6_forward",
       "id" : 2,
       "runtime_data" : [
         {
@@ -303,8 +241,8 @@
             }
           ],
           "source_info" : {
-            "filename" : "basic.p4",
-            "line" : 87,
+            "filename" : "ipv6.p4",
+            "line" : 82,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = port"
           }
@@ -322,8 +260,8 @@
             }
           ],
           "source_info" : {
-            "filename" : "basic.p4",
-            "line" : 88,
+            "filename" : "ipv6.p4",
+            "line" : 83,
             "column" : 8,
             "source_fragment" : "hdr.ethernet.srcAddr = hdr.ethernet.dstAddr"
           }
@@ -341,8 +279,8 @@
             }
           ],
           "source_info" : {
-            "filename" : "basic.p4",
-            "line" : 89,
+            "filename" : "ipv6.p4",
+            "line" : 84,
             "column" : 8,
             "source_fragment" : "hdr.ethernet.dstAddr = dstAddr"
           }
@@ -352,7 +290,7 @@
           "parameters" : [
             {
               "type" : "field",
-              "value" : ["ipv4", "ttl"]
+              "value" : ["ipv6", "hopLimit"]
             },
             {
               "type" : "expression",
@@ -366,7 +304,7 @@
                       "op" : "+",
                       "left" : {
                         "type" : "field",
-                        "value" : ["ipv4", "ttl"]
+                        "value" : ["ipv6", "hopLimit"]
                       },
                       "right" : {
                         "type" : "hexstr",
@@ -383,10 +321,10 @@
             }
           ],
           "source_info" : {
-            "filename" : "basic.p4",
-            "line" : 90,
+            "filename" : "ipv6.p4",
+            "line" : 85,
             "column" : 8,
-            "source_fragment" : "hdr.ipv4.ttl = hdr.ipv4.ttl - 1"
+            "source_fragment" : "hdr.ipv6.hopLimit = hdr.ipv6.hopLimit - 1"
           }
         }
       ]
@@ -397,27 +335,27 @@
       "name" : "ingress",
       "id" : 0,
       "source_info" : {
-        "filename" : "basic.p4",
-        "line" : 79,
+        "filename" : "ipv6.p4",
+        "line" : 74,
         "column" : 8,
         "source_fragment" : "MyIngress"
       },
       "init_table" : "node_2",
       "tables" : [
         {
-          "name" : "MyIngress.ipv4_lpm",
+          "name" : "MyIngress.ipv6_lpm",
           "id" : 0,
           "source_info" : {
-            "filename" : "basic.p4",
-            "line" : 93,
+            "filename" : "ipv6.p4",
+            "line" : 88,
             "column" : 10,
-            "source_fragment" : "ipv4_lpm"
+            "source_fragment" : "ipv6_lpm"
           },
           "key" : [
             {
               "match_type" : "lpm",
-              "name" : "hdr.ipv4.dstAddr",
-              "target" : ["ipv4", "dstAddr"],
+              "name" : "hdr.ipv6.dstAddr",
+              "target" : ["ipv6", "dstAddr"],
               "mask" : null
             }
           ],
@@ -428,10 +366,10 @@
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [2, 1, 0],
-          "actions" : ["MyIngress.ipv4_forward", "MyIngress.drop", "NoAction"],
+          "actions" : ["MyIngress.ipv6_forward", "MyIngress.drop", "NoAction"],
           "base_default_next" : null,
           "next_tables" : {
-            "MyIngress.ipv4_forward" : null,
+            "MyIngress.ipv6_forward" : null,
             "MyIngress.drop" : null,
             "NoAction" : null
           },
@@ -449,10 +387,10 @@
           "name" : "node_2",
           "id" : 0,
           "source_info" : {
-            "filename" : "basic.p4",
-            "line" : 107,
+            "filename" : "ipv6.p4",
+            "line" : 102,
             "column" : 12,
-            "source_fragment" : "hdr.ipv4.isValid()"
+            "source_fragment" : "hdr.ipv6.isValid()"
           },
           "expression" : {
             "type" : "expression",
@@ -461,12 +399,12 @@
               "left" : null,
               "right" : {
                 "type" : "field",
-                "value" : ["ipv4", "$valid$"]
+                "value" : ["ipv6", "$valid$"]
               }
             }
           },
           "false_next" : null,
-          "true_next" : "MyIngress.ipv4_lpm"
+          "true_next" : "MyIngress.ipv6_lpm"
         }
       ]
     },
@@ -474,8 +412,8 @@
       "name" : "egress",
       "id" : 1,
       "source_info" : {
-        "filename" : "basic.p4",
-        "line" : 115,
+        "filename" : "ipv6.p4",
+        "line" : 110,
         "column" : 8,
         "source_fragment" : "MyEgress"
       },
@@ -485,34 +423,7 @@
       "conditionals" : []
     }
   ],
-  "checksums" : [
-    {
-      "name" : "cksum",
-      "id" : 0,
-      "source_info" : {
-        "filename" : "basic.p4",
-        "line" : 125,
-        "column" : 8,
-        "source_fragment" : "update_checksum( ..."
-      },
-      "target" : ["ipv4", "hdrChecksum"],
-      "type" : "generic",
-      "calculation" : "calc",
-      "verify" : false,
-      "update" : true,
-      "if_cond" : {
-        "type" : "expression",
-        "value" : {
-          "op" : "d2b",
-          "left" : null,
-          "right" : {
-            "type" : "field",
-            "value" : ["ipv4", "$valid$"]
-          }
-        }
-      }
-    }
-  ],
+  "checksums" : [],
   "force_arith" : [],
   "extern_instances" : [],
   "field_aliases" : [
@@ -553,7 +464,7 @@
       ["standard_metadata", "priority"]
     ]
   ],
-  "program" : "basic.p4",
+  "program" : "ipv6.p4",
   "__meta__" : {
     "version" : [2, 23],
     "compiler" : "https://github.com/p4lang/p4c"
