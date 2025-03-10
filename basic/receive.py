@@ -15,6 +15,7 @@ from scapy.all import (
     sniff
 )
 from scapy.layers.inet import _IPOption_HDR
+from scapy.layers.inet6 import IPv6
 
 
 def get_if():
@@ -23,7 +24,7 @@ def get_if():
     for i in get_if_list():
         if "eth0" in i:
             iface=i
-            break;
+            break
     if not iface:
         print("Cannot find eth0 interface")
         exit(1)
@@ -45,7 +46,6 @@ def handle_pkt(pkt):
     if TCP in pkt and pkt[TCP].dport == 1234:
         print("got a packet")
         pkt.show2()
-    #    hexdump(pkt)
         sys.stdout.flush()
 
 

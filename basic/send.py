@@ -5,7 +5,7 @@ import random
 import socket
 import sys
 
-from scapy.all import IP, TCP, Ether, get_if_hwaddr, get_if_list, sendp
+from scapy.all import IPv6 ,IP, TCP, Ether, get_if_hwaddr, get_if_list, sendp
 
 
 def get_if():
@@ -14,7 +14,7 @@ def get_if():
     for i in get_if_list():
         if "eth0" in i:
             iface=i
-            break;
+            break
     if not iface:
         print("Cannot find eth0 interface")
         exit(1)
@@ -26,12 +26,12 @@ def main():
         print('pass 2 arguments: <destination> "<message>"')
         exit(1)
 
-    addr = socket.gethostbyname(sys.argv[1])
+    addr = socket.getaddrinfo(sys.argv[1], None, socket.AF_INET6)[0][4][0]
     iface = get_if()
 
     print("sending on interface %s to %s" % (iface, str(addr)))
     pkt =  Ether(src=get_if_hwaddr(iface), dst='ff:ff:ff:ff:ff:ff')
-    pkt = pkt /IP(dst=addr) / TCP(dport=1234, sport=random.randint(49152,65535)) / sys.argv[2]
+    pkt = pkt /IPv6(dst=addr) / TCP(dport=1234, sport=random.randint(49152,65535)) / sys.argv[2]
     pkt.show2()
     sendp(pkt, iface=iface, verbose=False)
 
