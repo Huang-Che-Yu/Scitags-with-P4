@@ -1,10 +1,10 @@
 
-[2025-03-10 04:45:20.852] /p4.v1.P4Runtime/SetForwardingPipelineConfig
+[2025-03-13 17:38:02.096] /p4.v1.P4Runtime/SetForwardingPipelineConfig
 ---
 Message too long (14022 bytes)! Skipping log...
 ---
 
-[2025-03-10 04:45:20.960] /p4.v1.P4Runtime/Write
+[2025-03-13 17:38:02.254] /p4.v1.P4Runtime/Write
 ---
 election_id {
   low: 1
@@ -25,7 +25,7 @@ updates {
 }
 ---
 
-[2025-03-10 04:45:20.974] /p4.v1.P4Runtime/Write
+[2025-03-13 17:38:02.283] /p4.v1.P4Runtime/Write
 ---
 election_id {
   low: 1
@@ -38,7 +38,7 @@ updates {
       match {
         field_id: 1
         lpm {
-          value: "\375\000\000\000\000\000\000\000\000\000\000\000\000\000\000\021"
+          value: "\273\377\000\000\000\000\000\000\000\000\000\000\000\000\000\021"
           prefix_len: 128
         }
       }
@@ -60,7 +60,7 @@ updates {
 }
 ---
 
-[2025-03-10 04:45:20.986] /p4.v1.P4Runtime/Write
+[2025-03-13 17:38:02.362] /p4.v1.P4Runtime/Write
 ---
 election_id {
   low: 1
@@ -73,7 +73,7 @@ updates {
       match {
         field_id: 1
         lpm {
-          value: "\375\000\000\000\000\000\000\000\000\000\000\000\000\000\000\""
+          value: "\273\377\000\000\000\000\000\000\000\000\000\000\000\000\000\""
           prefix_len: 128
         }
       }
@@ -95,7 +95,7 @@ updates {
 }
 ---
 
-[2025-03-10 04:45:21.016] /p4.v1.P4Runtime/Write
+[2025-03-13 17:38:02.412] /p4.v1.P4Runtime/Write
 ---
 election_id {
   low: 1
@@ -108,7 +108,7 @@ updates {
       match {
         field_id: 1
         lpm {
-          value: "\375\000\000\000\000\000\000\000\000\000\000\000\000\000\0003"
+          value: "\273\377\000\000\000\000\000\000\000\000\000\000\000\000\0003"
           prefix_len: 128
         }
       }

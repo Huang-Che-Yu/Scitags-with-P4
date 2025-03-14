@@ -1,45 +1,45 @@
 {
     "hosts": {
         "h1": {
-            "ip": "10.0.1.1/24",
+            "ip": "172.16.1.1/24",
             "mac": "08:00:00:00:01:11",
             "commands": [
-                "route add default gw 10.0.1.10 dev eth0",
-                "arp -i eth0 -s 10.0.1.10 08:00:00:00:01:00",
+                "route add default gw 172.16.1.10 dev eth0",
+                "arp -i eth0 -s 172.16.1.10 08:00:00:00:01:00",
                 "sysctl -w net.ipv6.conf.lo.disable_ipv6=0",
                 "sysctl -w net.ipv6.conf.eth0.disable_ipv6=0",
-                "ip address add fd00::11/64 dev eth0",
-                "ip -6 route add default via fd00::10 dev eth0",
-                "ip -6 neigh add fd00::22 lladdr 08:00:00:00:02:22 dev eth0",
-                "ip -6 neigh add fd00::33 lladdr 08:00:00:00:03:33 dev eth0"
+                "ip address add bbff::11/64 dev eth0",
+                "ip -6 route add default via bbff::10 dev eth0",
+                "ip -6 neigh add bbff::22 lladdr 08:00:00:00:02:22 dev eth0",
+                "ip -6 neigh add bbff::33 lladdr 08:00:00:00:03:33 dev eth0"
             ]
         },
         "h2": {
-            "ip": "10.0.2.2/24",
+            "ip": "172.16.2.2/24",
             "mac": "08:00:00:00:02:22",
             "commands": [
-                "route add default gw 10.0.2.20 dev eth0",
-                "arp -i eth0 -s 10.0.2.20 08:00:00:00:02:00",
+                "route add default gw 172.16.2.20 dev eth0",
+                "arp -i eth0 -s 172.16.2.20 08:00:00:00:02:00",
                 "sysctl -w net.ipv6.conf.lo.disable_ipv6=0",
                 "sysctl -w net.ipv6.conf.eth0.disable_ipv6=0",
-                "ip addr add fd00::22/64 dev eth0",
-                "ip -6 route add default via fd00::20 dev eth0",
-                "ip -6 neigh add fd00::11 lladdr 08:00:00:00:01:11 dev eth0",
-                "ip -6 neigh add fd00::33 lladdr 08:00:00:00:03:33 dev eth0"
+                "ip addr add bbff::22/64 dev eth0",
+                "ip -6 route add default via bbff::20 dev eth0",
+                "ip -6 neigh add bbff::11 lladdr 08:00:00:00:01:11 dev eth0",
+                "ip -6 neigh add bbff::33 lladdr 08:00:00:00:03:33 dev eth0"
             ]
         },
         "h3": {
-            "ip": "10.0.3.3/24",
+            "ip": "172.16.3.3/24",
             "mac": "08:00:00:00:03:33",
             "commands": [
-                "route add default gw 10.0.3.30 dev eth0",
-                "arp -i eth0 -s 10.0.3.30 08:00:00:00:03:00",
+                "route add default gw 172.16.3.30 dev eth0",
+                "arp -i eth0 -s 172.16.3.30 08:00:00:00:03:00",
                 "sysctl -w net.ipv6.conf.lo.disable_ipv6=0",
                 "sysctl -w net.ipv6.conf.eth0.disable_ipv6=0",
-                "ip addr add fd00::33/64 dev eth0",
-                "ip -6 route add default via fd00::30 dev eth0",
-                "ip -6 neigh add fd00::11 lladdr 08:00:00:00:01:11 dev eth0",
-                "ip -6 neigh add fd00::22 lladdr 08:00:00:00:02:22 dev eth0"
+                "ip addr add bbff::33/64 dev eth0",
+                "ip -6 route add default via bbff::30 dev eth0",
+                "ip -6 neigh add bbff::11 lladdr 08:00:00:00:01:11 dev eth0",
+                "ip -6 neigh add bbff::22 lladdr 08:00:00:00:02:22 dev eth0"
             ]
         }
     },
