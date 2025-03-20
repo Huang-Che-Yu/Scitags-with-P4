@@ -1,5 +1,39 @@
 # Scitags-with-P4
 
+## 20250320
+
+- Monitor the packets sent and received by the host with Prometheus in FlowLabel_Exporter.py
+
+- Use the host's network interface and transmitted/received packets for classification.
+
+- Divide IPv6 packets' scitags into "14 16" and "others".
+
+- Integrate information from Prometheus into Grafana's dashboard for data visualization.
+
+### Experimental Commands
+```
+# start prometheus in port 9000
+sudo prometheus --config.file=/etc/prometheus/prometheus.yml --web.listen-address=:9000
+sudo python3 FlowLabel_Exporter.py
+
+# start grafana
+/usr/local/grafana/bin ./grafana-server &
+
+# enter host's command line
+sudo mnexec -a $(pgrep -f "mininet:h1") bash
+
+in h1:
+    python3 app.py
+    sudo flowd -d
+    iperf3 -c bbff::22 -t 60
+
+in h2:
+    iperf3 -s
+```
+
+### Monitoring in Grafana
+![image](./image/Monitoring.png)
+
 ## 20250314
 
 - install [flowd](https://github.com/scitags/flowd) and set flowd.cfg

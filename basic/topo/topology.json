@@ -45,7 +45,7 @@
     },
     "switches": {
         "s1": {
-            "runtime_json": "topo/s1-runtime-ipv6.json"
+            "runtime_json": "topo/s1-runtime.json"
         }
     },
     "links": [
