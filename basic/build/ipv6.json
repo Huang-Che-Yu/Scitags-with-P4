@@ -3,7 +3,11 @@
     {
       "name" : "scalars_0",
       "id" : 0,
-      "fields" : []
+      "fields" : [
+        ["tmp", 6, false],
+        ["tmp_0", 9, false],
+        ["_padding_0", 1, false]
+      ]
     },
     {
       "name" : "standard_metadata",
@@ -172,7 +176,7 @@
       "id" : 0,
       "source_info" : {
         "filename" : "ipv6.p4",
-        "line" : 128,
+        "line" : 158,
         "column" : 8,
         "source_fragment" : "MyDeparser"
       },
@@ -182,7 +186,44 @@
   ],
   "meter_arrays" : [],
   "counter_arrays" : [],
-  "register_arrays" : [],
+  "register_arrays" : [
+    {
+      "name" : "activity_reg",
+      "id" : 0,
+      "source_info" : {
+        "filename" : "ipv6.p4",
+        "line" : 74,
+        "column" : 20,
+        "source_fragment" : "activity_reg"
+      },
+      "size" : 1,
+      "bitwidth" : 6
+    },
+    {
+      "name" : "experiment_reg",
+      "id" : 1,
+      "source_info" : {
+        "filename" : "ipv6.p4",
+        "line" : 75,
+        "column" : 20,
+        "source_fragment" : "experiment_reg"
+      },
+      "size" : 1,
+      "bitwidth" : 9
+    },
+    {
+      "name" : "flow_label_reg",
+      "id" : 2,
+      "source_info" : {
+        "filename" : "ipv6.p4",
+        "line" : 76,
+        "column" : 21,
+        "source_fragment" : "flow_label_reg"
+      },
+      "size" : 1,
+      "bitwidth" : 20
+    }
+  ],
   "calculations" : [],
   "learn_lists" : [],
   "actions" : [
@@ -207,7 +248,29 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 78,
+            "line" : 84,
+            "column" : 8,
+            "source_fragment" : "mark_to_drop(standard_metadata)"
+          }
+        }
+      ]
+    },
+    {
+      "name" : "MyIngress.drop",
+      "id" : 2,
+      "runtime_data" : [],
+      "primitives" : [
+        {
+          "op" : "mark_to_drop",
+          "parameters" : [
+            {
+              "type" : "header",
+              "value" : "standard_metadata"
+            }
+          ],
+          "source_info" : {
+            "filename" : "ipv6.p4",
+            "line" : 84,
             "column" : 8,
             "source_fragment" : "mark_to_drop(standard_metadata)"
           }
@@ -216,7 +279,7 @@
     },
     {
       "name" : "MyIngress.ipv6_forward",
-      "id" : 2,
+      "id" : 3,
       "runtime_data" : [
         {
           "name" : "dstAddr",
@@ -242,7 +305,7 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 82,
+            "line" : 88,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = port"
           }
@@ -261,7 +324,7 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 83,
+            "line" : 89,
             "column" : 8,
             "source_fragment" : "hdr.ethernet.srcAddr = hdr.ethernet.dstAddr"
           }
@@ -280,7 +343,7 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 84,
+            "line" : 90,
             "column" : 8,
             "source_fragment" : "hdr.ethernet.dstAddr = dstAddr"
           }
@@ -322,9 +385,189 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 85,
+            "line" : 91,
             "column" : 8,
             "source_fragment" : "hdr.ipv6.hopLimit = hdr.ipv6.hopLimit - 1"
+          }
+        }
+      ]
+    },
+    {
+      "name" : "MyIngress.store_flow_label",
+      "id" : 4,
+      "runtime_data" : [],
+      "primitives" : [
+        {
+          "op" : "assign",
+          "parameters" : [
+            {
+              "type" : "field",
+              "value" : ["scalars", "tmp"]
+            },
+            {
+              "type" : "expression",
+              "value" : {
+                "type" : "expression",
+                "value" : {
+                  "op" : "&",
+                  "left" : {
+                    "type" : "expression",
+                    "value" : {
+                      "op" : "&",
+                      "left" : {
+                        "type" : "expression",
+                        "value" : {
+                          "op" : ">>",
+                          "left" : {
+                            "type" : "field",
+                            "value" : ["ipv6", "flowLabel"]
+                          },
+                          "right" : {
+                            "type" : "hexstr",
+                            "value" : "0x2"
+                          }
+                        }
+                      },
+                      "right" : {
+                        "type" : "hexstr",
+                        "value" : "0x0fffff"
+                      }
+                    }
+                  },
+                  "right" : {
+                    "type" : "hexstr",
+                    "value" : "0x3f"
+                  }
+                }
+              }
+            }
+          ],
+          "source_info" : {
+            "filename" : "ipv6.p4",
+            "line" : 95,
+            "column" : 30,
+            "source_fragment" : "hdr.ipv6.flowLabel[7:2]"
+          }
+        },
+        {
+          "op" : "register_write",
+          "parameters" : [
+            {
+              "type" : "register_array",
+              "value" : "activity_reg"
+            },
+            {
+              "type" : "hexstr",
+              "value" : "0x00000000"
+            },
+            {
+              "type" : "field",
+              "value" : ["scalars", "tmp"]
+            }
+          ],
+          "source_info" : {
+            "filename" : "ipv6.p4",
+            "line" : 95,
+            "column" : 8,
+            "source_fragment" : "activity_reg.write(0, hdr.ipv6.flowLabel[7:2])"
+          }
+        },
+        {
+          "op" : "assign",
+          "parameters" : [
+            {
+              "type" : "field",
+              "value" : ["scalars", "tmp_0"]
+            },
+            {
+              "type" : "expression",
+              "value" : {
+                "type" : "expression",
+                "value" : {
+                  "op" : "&",
+                  "left" : {
+                    "type" : "expression",
+                    "value" : {
+                      "op" : "&",
+                      "left" : {
+                        "type" : "expression",
+                        "value" : {
+                          "op" : ">>",
+                          "left" : {
+                            "type" : "field",
+                            "value" : ["ipv6", "flowLabel"]
+                          },
+                          "right" : {
+                            "type" : "hexstr",
+                            "value" : "0x9"
+                          }
+                        }
+                      },
+                      "right" : {
+                        "type" : "hexstr",
+                        "value" : "0x0fffff"
+                      }
+                    }
+                  },
+                  "right" : {
+                    "type" : "hexstr",
+                    "value" : "0x01ff"
+                  }
+                }
+              }
+            }
+          ],
+          "source_info" : {
+            "filename" : "ipv6.p4",
+            "line" : 96,
+            "column" : 32,
+            "source_fragment" : "hdr.ipv6.flowLabel[17:9]"
+          }
+        },
+        {
+          "op" : "register_write",
+          "parameters" : [
+            {
+              "type" : "register_array",
+              "value" : "experiment_reg"
+            },
+            {
+              "type" : "hexstr",
+              "value" : "0x00000000"
+            },
+            {
+              "type" : "field",
+              "value" : ["scalars", "tmp_0"]
+            }
+          ],
+          "source_info" : {
+            "filename" : "ipv6.p4",
+            "line" : 96,
+            "column" : 8,
+            "source_fragment" : "experiment_reg.write(0, hdr.ipv6.flowLabel[17:9])"
+          }
+        },
+        {
+          "op" : "register_write",
+          "parameters" : [
+            {
+              "type" : "register_array",
+              "value" : "flow_label_reg"
+            },
+            {
+              "type" : "hexstr",
+              "value" : "0x00000000"
+            },
+            {
+              "type" : "field",
+              "value" : ["ipv6", "flowLabel"]
+            }
+          ],
+          "source_info" : {
+            "filename" : "ipv6.p4",
+            "line" : 97,
+            "column" : 8,
+            "source_fragment" : "flow_label_reg.write(0, hdr.ipv6.flowLabel)"
           }
         }
       ]
@@ -336,18 +579,76 @@
       "id" : 0,
       "source_info" : {
         "filename" : "ipv6.p4",
-        "line" : 74,
+        "line" : 80,
         "column" : 8,
         "source_fragment" : "MyIngress"
       },
       "init_table" : "node_2",
       "tables" : [
         {
-          "name" : "MyIngress.ipv6_lpm",
+          "name" : "tbl_store_flow_label",
           "id" : 0,
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 88,
+            "line" : 127,
+            "column" : 12,
+            "source_fragment" : "store_flow_label()"
+          },
+          "key" : [],
+          "match_type" : "exact",
+          "type" : "simple",
+          "max_size" : 1024,
+          "with_counters" : false,
+          "support_timeout" : false,
+          "direct_meters" : null,
+          "action_ids" : [4],
+          "actions" : ["MyIngress.store_flow_label"],
+          "base_default_next" : "node_4",
+          "next_tables" : {
+            "MyIngress.store_flow_label" : "node_4"
+          },
+          "default_entry" : {
+            "action_id" : 4,
+            "action_const" : true,
+            "action_data" : [],
+            "action_entry_const" : true
+          }
+        },
+        {
+          "name" : "tbl_drop",
+          "id" : 1,
+          "source_info" : {
+            "filename" : "ipv6.p4",
+            "line" : 129,
+            "column" : 16,
+            "source_fragment" : "drop()"
+          },
+          "key" : [],
+          "match_type" : "exact",
+          "type" : "simple",
+          "max_size" : 1024,
+          "with_counters" : false,
+          "support_timeout" : false,
+          "direct_meters" : null,
+          "action_ids" : [2],
+          "actions" : ["MyIngress.drop"],
+          "base_default_next" : null,
+          "next_tables" : {
+            "MyIngress.drop" : null
+          },
+          "default_entry" : {
+            "action_id" : 2,
+            "action_const" : true,
+            "action_data" : [],
+            "action_entry_const" : true
+          }
+        },
+        {
+          "name" : "MyIngress.ipv6_lpm",
+          "id" : 2,
+          "source_info" : {
+            "filename" : "ipv6.p4",
+            "line" : 100,
             "column" : 10,
             "source_fragment" : "ipv6_lpm"
           },
@@ -365,7 +666,7 @@
           "with_counters" : false,
           "support_timeout" : false,
           "direct_meters" : null,
-          "action_ids" : [2, 1, 0],
+          "action_ids" : [3, 1, 0],
           "actions" : ["MyIngress.ipv6_forward", "MyIngress.drop", "NoAction"],
           "base_default_next" : null,
           "next_tables" : {
@@ -388,7 +689,7 @@
           "id" : 0,
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 102,
+            "line" : 114,
             "column" : 12,
             "source_fragment" : "hdr.ipv6.isValid()"
           },
@@ -404,7 +705,683 @@
             }
           },
           "false_next" : null,
-          "true_next" : "MyIngress.ipv6_lpm"
+          "true_next" : "tbl_store_flow_label"
+        },
+        {
+          "name" : "node_4",
+          "id" : 1,
+          "source_info" : {
+            "filename" : "ipv6.p4",
+            "line" : 128,
+            "column" : 16,
+            "source_fragment" : "activity == 14 && exp_id_reversed == 16"
+          },
+          "expression" : {
+            "type" : "expression",
+            "value" : {
+              "op" : "and",
+              "left" : {
+                "type" : "expression",
+                "value" : {
+                  "op" : "==",
+                  "left" : {
+                    "type" : "expression",
+                    "value" : {
+                      "op" : "&",
+                      "left" : {
+                        "type" : "expression",
+                        "value" : {
+                          "op" : "&",
+                          "left" : {
+                            "type" : "expression",
+                            "value" : {
+                              "op" : ">>",
+                              "left" : {
+                                "type" : "field",
+                                "value" : ["ipv6", "flowLabel"]
+                              },
+                              "right" : {
+                                "type" : "hexstr",
+                                "value" : "0x2"
+                              }
+                            }
+                          },
+                          "right" : {
+                            "type" : "hexstr",
+                            "value" : "0x0fffff"
+                          }
+                        }
+                      },
+                      "right" : {
+                        "type" : "hexstr",
+                        "value" : "0x3f"
+                      }
+                    }
+                  },
+                  "right" : {
+                    "type" : "hexstr",
+                    "value" : "0x0e"
+                  }
+                }
+              },
+              "right" : {
+                "type" : "expression",
+                "value" : {
+                  "op" : "==",
+                  "left" : {
+                    "type" : "expression",
+                    "value" : {
+                      "op" : "|",
+                      "left" : {
+                        "type" : "expression",
+                        "value" : {
+                          "op" : "|",
+                          "left" : {
+                            "type" : "expression",
+                            "value" : {
+                              "op" : "|",
+                              "left" : {
+                                "type" : "expression",
+                                "value" : {
+                                  "op" : "|",
+                                  "left" : {
+                                    "type" : "expression",
+                                    "value" : {
+                                      "op" : "|",
+                                      "left" : {
+                                        "type" : "expression",
+                                        "value" : {
+                                          "op" : "|",
+                                          "left" : {
+                                            "type" : "expression",
+                                            "value" : {
+                                              "op" : "|",
+                                              "left" : {
+                                                "type" : "expression",
+                                                "value" : {
+                                                  "op" : "|",
+                                                  "left" : {
+                                                    "type" : "expression",
+                                                    "value" : {
+                                                      "op" : "&",
+                                                      "left" : {
+                                                        "type" : "expression",
+                                                        "value" : {
+                                                          "op" : "<<",
+                                                          "left" : {
+                                                            "type" : "expression",
+                                                            "value" : {
+                                                              "op" : "&",
+                                                              "left" : {
+                                                                "type" : "expression",
+                                                                "value" : {
+                                                                  "op" : "&",
+                                                                  "left" : {
+                                                                    "type" : "expression",
+                                                                    "value" : {
+                                                                      "op" : "&",
+                                                                      "left" : {
+                                                                        "type" : "expression",
+                                                                        "value" : {
+                                                                          "op" : ">>",
+                                                                          "left" : {
+                                                                            "type" : "field",
+                                                                            "value" : ["ipv6", "flowLabel"]
+                                                                          },
+                                                                          "right" : {
+                                                                            "type" : "hexstr",
+                                                                            "value" : "0x9"
+                                                                          }
+                                                                        }
+                                                                      },
+                                                                      "right" : {
+                                                                        "type" : "hexstr",
+                                                                        "value" : "0x0fffff"
+                                                                      }
+                                                                    }
+                                                                  },
+                                                                  "right" : {
+                                                                    "type" : "hexstr",
+                                                                    "value" : "0x01ff"
+                                                                  }
+                                                                }
+                                                              },
+                                                              "right" : {
+                                                                "type" : "hexstr",
+                                                                "value" : "0x0001"
+                                                              }
+                                                            }
+                                                          },
+                                                          "right" : {
+                                                            "type" : "hexstr",
+                                                            "value" : "0x8"
+                                                          }
+                                                        }
+                                                      },
+                                                      "right" : {
+                                                        "type" : "hexstr",
+                                                        "value" : "0x01ff"
+                                                      }
+                                                    }
+                                                  },
+                                                  "right" : {
+                                                    "type" : "expression",
+                                                    "value" : {
+                                                      "op" : "&",
+                                                      "left" : {
+                                                        "type" : "expression",
+                                                        "value" : {
+                                                          "op" : "<<",
+                                                          "left" : {
+                                                            "type" : "expression",
+                                                            "value" : {
+                                                              "op" : "&",
+                                                              "left" : {
+                                                                "type" : "expression",
+                                                                "value" : {
+                                                                  "op" : "&",
+                                                                  "left" : {
+                                                                    "type" : "expression",
+                                                                    "value" : {
+                                                                      "op" : "&",
+                                                                      "left" : {
+                                                                        "type" : "expression",
+                                                                        "value" : {
+                                                                          "op" : ">>",
+                                                                          "left" : {
+                                                                            "type" : "field",
+                                                                            "value" : ["ipv6", "flowLabel"]
+                                                                          },
+                                                                          "right" : {
+                                                                            "type" : "hexstr",
+                                                                            "value" : "0x9"
+                                                                          }
+                                                                        }
+                                                                      },
+                                                                      "right" : {
+                                                                        "type" : "hexstr",
+                                                                        "value" : "0x0fffff"
+                                                                      }
+                                                                    }
+                                                                  },
+                                                                  "right" : {
+                                                                    "type" : "hexstr",
+                                                                    "value" : "0x01ff"
+                                                                  }
+                                                                }
+                                                              },
+                                                              "right" : {
+                                                                "type" : "hexstr",
+                                                                "value" : "0x0002"
+                                                              }
+                                                            }
+                                                          },
+                                                          "right" : {
+                                                            "type" : "hexstr",
+                                                            "value" : "0x6"
+                                                          }
+                                                        }
+                                                      },
+                                                      "right" : {
+                                                        "type" : "hexstr",
+                                                        "value" : "0x01ff"
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "right" : {
+                                                "type" : "expression",
+                                                "value" : {
+                                                  "op" : "&",
+                                                  "left" : {
+                                                    "type" : "expression",
+                                                    "value" : {
+                                                      "op" : "<<",
+                                                      "left" : {
+                                                        "type" : "expression",
+                                                        "value" : {
+                                                          "op" : "&",
+                                                          "left" : {
+                                                            "type" : "expression",
+                                                            "value" : {
+                                                              "op" : "&",
+                                                              "left" : {
+                                                                "type" : "expression",
+                                                                "value" : {
+                                                                  "op" : "&",
+                                                                  "left" : {
+                                                                    "type" : "expression",
+                                                                    "value" : {
+                                                                      "op" : ">>",
+                                                                      "left" : {
+                                                                        "type" : "field",
+                                                                        "value" : ["ipv6", "flowLabel"]
+                                                                      },
+                                                                      "right" : {
+                                                                        "type" : "hexstr",
+                                                                        "value" : "0x9"
+                                                                      }
+                                                                    }
+                                                                  },
+                                                                  "right" : {
+                                                                    "type" : "hexstr",
+                                                                    "value" : "0x0fffff"
+                                                                  }
+                                                                }
+                                                              },
+                                                              "right" : {
+                                                                "type" : "hexstr",
+                                                                "value" : "0x01ff"
+                                                              }
+                                                            }
+                                                          },
+                                                          "right" : {
+                                                            "type" : "hexstr",
+                                                            "value" : "0x0004"
+                                                          }
+                                                        }
+                                                      },
+                                                      "right" : {
+                                                        "type" : "hexstr",
+                                                        "value" : "0x4"
+                                                      }
+                                                    }
+                                                  },
+                                                  "right" : {
+                                                    "type" : "hexstr",
+                                                    "value" : "0x01ff"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "right" : {
+                                            "type" : "expression",
+                                            "value" : {
+                                              "op" : "&",
+                                              "left" : {
+                                                "type" : "expression",
+                                                "value" : {
+                                                  "op" : "<<",
+                                                  "left" : {
+                                                    "type" : "expression",
+                                                    "value" : {
+                                                      "op" : "&",
+                                                      "left" : {
+                                                        "type" : "expression",
+                                                        "value" : {
+                                                          "op" : "&",
+                                                          "left" : {
+                                                            "type" : "expression",
+                                                            "value" : {
+                                                              "op" : "&",
+                                                              "left" : {
+                                                                "type" : "expression",
+                                                                "value" : {
+                                                                  "op" : ">>",
+                                                                  "left" : {
+                                                                    "type" : "field",
+                                                                    "value" : ["ipv6", "flowLabel"]
+                                                                  },
+                                                                  "right" : {
+                                                                    "type" : "hexstr",
+                                                                    "value" : "0x9"
+                                                                  }
+                                                                }
+                                                              },
+                                                              "right" : {
+                                                                "type" : "hexstr",
+                                                                "value" : "0x0fffff"
+                                                              }
+                                                            }
+                                                          },
+                                                          "right" : {
+                                                            "type" : "hexstr",
+                                                            "value" : "0x01ff"
+                                                          }
+                                                        }
+                                                      },
+                                                      "right" : {
+                                                        "type" : "hexstr",
+                                                        "value" : "0x0008"
+                                                      }
+                                                    }
+                                                  },
+                                                  "right" : {
+                                                    "type" : "hexstr",
+                                                    "value" : "0x2"
+                                                  }
+                                                }
+                                              },
+                                              "right" : {
+                                                "type" : "hexstr",
+                                                "value" : "0x01ff"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "right" : {
+                                        "type" : "expression",
+                                        "value" : {
+                                          "op" : "&",
+                                          "left" : {
+                                            "type" : "expression",
+                                            "value" : {
+                                              "op" : "&",
+                                              "left" : {
+                                                "type" : "expression",
+                                                "value" : {
+                                                  "op" : "&",
+                                                  "left" : {
+                                                    "type" : "expression",
+                                                    "value" : {
+                                                      "op" : ">>",
+                                                      "left" : {
+                                                        "type" : "field",
+                                                        "value" : ["ipv6", "flowLabel"]
+                                                      },
+                                                      "right" : {
+                                                        "type" : "hexstr",
+                                                        "value" : "0x9"
+                                                      }
+                                                    }
+                                                  },
+                                                  "right" : {
+                                                    "type" : "hexstr",
+                                                    "value" : "0x0fffff"
+                                                  }
+                                                }
+                                              },
+                                              "right" : {
+                                                "type" : "hexstr",
+                                                "value" : "0x01ff"
+                                              }
+                                            }
+                                          },
+                                          "right" : {
+                                            "type" : "hexstr",
+                                            "value" : "0x0010"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "right" : {
+                                    "type" : "expression",
+                                    "value" : {
+                                      "op" : "&",
+                                      "left" : {
+                                        "type" : "expression",
+                                        "value" : {
+                                          "op" : ">>",
+                                          "left" : {
+                                            "type" : "expression",
+                                            "value" : {
+                                              "op" : "&",
+                                              "left" : {
+                                                "type" : "expression",
+                                                "value" : {
+                                                  "op" : "&",
+                                                  "left" : {
+                                                    "type" : "expression",
+                                                    "value" : {
+                                                      "op" : "&",
+                                                      "left" : {
+                                                        "type" : "expression",
+                                                        "value" : {
+                                                          "op" : ">>",
+                                                          "left" : {
+                                                            "type" : "field",
+                                                            "value" : ["ipv6", "flowLabel"]
+                                                          },
+                                                          "right" : {
+                                                            "type" : "hexstr",
+                                                            "value" : "0x9"
+                                                          }
+                                                        }
+                                                      },
+                                                      "right" : {
+                                                        "type" : "hexstr",
+                                                        "value" : "0x0fffff"
+                                                      }
+                                                    }
+                                                  },
+                                                  "right" : {
+                                                    "type" : "hexstr",
+                                                    "value" : "0x01ff"
+                                                  }
+                                                }
+                                              },
+                                              "right" : {
+                                                "type" : "hexstr",
+                                                "value" : "0x0020"
+                                              }
+                                            }
+                                          },
+                                          "right" : {
+                                            "type" : "hexstr",
+                                            "value" : "0x2"
+                                          }
+                                        }
+                                      },
+                                      "right" : {
+                                        "type" : "hexstr",
+                                        "value" : "0x01ff"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "right" : {
+                                "type" : "expression",
+                                "value" : {
+                                  "op" : "&",
+                                  "left" : {
+                                    "type" : "expression",
+                                    "value" : {
+                                      "op" : ">>",
+                                      "left" : {
+                                        "type" : "expression",
+                                        "value" : {
+                                          "op" : "&",
+                                          "left" : {
+                                            "type" : "expression",
+                                            "value" : {
+                                              "op" : "&",
+                                              "left" : {
+                                                "type" : "expression",
+                                                "value" : {
+                                                  "op" : "&",
+                                                  "left" : {
+                                                    "type" : "expression",
+                                                    "value" : {
+                                                      "op" : ">>",
+                                                      "left" : {
+                                                        "type" : "field",
+                                                        "value" : ["ipv6", "flowLabel"]
+                                                      },
+                                                      "right" : {
+                                                        "type" : "hexstr",
+                                                        "value" : "0x9"
+                                                      }
+                                                    }
+                                                  },
+                                                  "right" : {
+                                                    "type" : "hexstr",
+                                                    "value" : "0x0fffff"
+                                                  }
+                                                }
+                                              },
+                                              "right" : {
+                                                "type" : "hexstr",
+                                                "value" : "0x01ff"
+                                              }
+                                            }
+                                          },
+                                          "right" : {
+                                            "type" : "hexstr",
+                                            "value" : "0x0040"
+                                          }
+                                        }
+                                      },
+                                      "right" : {
+                                        "type" : "hexstr",
+                                        "value" : "0x4"
+                                      }
+                                    }
+                                  },
+                                  "right" : {
+                                    "type" : "hexstr",
+                                    "value" : "0x01ff"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "right" : {
+                            "type" : "expression",
+                            "value" : {
+                              "op" : "&",
+                              "left" : {
+                                "type" : "expression",
+                                "value" : {
+                                  "op" : ">>",
+                                  "left" : {
+                                    "type" : "expression",
+                                    "value" : {
+                                      "op" : "&",
+                                      "left" : {
+                                        "type" : "expression",
+                                        "value" : {
+                                          "op" : "&",
+                                          "left" : {
+                                            "type" : "expression",
+                                            "value" : {
+                                              "op" : "&",
+                                              "left" : {
+                                                "type" : "expression",
+                                                "value" : {
+                                                  "op" : ">>",
+                                                  "left" : {
+                                                    "type" : "field",
+                                                    "value" : ["ipv6", "flowLabel"]
+                                                  },
+                                                  "right" : {
+                                                    "type" : "hexstr",
+                                                    "value" : "0x9"
+                                                  }
+                                                }
+                                              },
+                                              "right" : {
+                                                "type" : "hexstr",
+                                                "value" : "0x0fffff"
+                                              }
+                                            }
+                                          },
+                                          "right" : {
+                                            "type" : "hexstr",
+                                            "value" : "0x01ff"
+                                          }
+                                        }
+                                      },
+                                      "right" : {
+                                        "type" : "hexstr",
+                                        "value" : "0x0080"
+                                      }
+                                    }
+                                  },
+                                  "right" : {
+                                    "type" : "hexstr",
+                                    "value" : "0x6"
+                                  }
+                                }
+                              },
+                              "right" : {
+                                "type" : "hexstr",
+                                "value" : "0x01ff"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "right" : {
+                        "type" : "expression",
+                        "value" : {
+                          "op" : "&",
+                          "left" : {
+                            "type" : "expression",
+                            "value" : {
+                              "op" : ">>",
+                              "left" : {
+                                "type" : "expression",
+                                "value" : {
+                                  "op" : "&",
+                                  "left" : {
+                                    "type" : "expression",
+                                    "value" : {
+                                      "op" : "&",
+                                      "left" : {
+                                        "type" : "expression",
+                                        "value" : {
+                                          "op" : "&",
+                                          "left" : {
+                                            "type" : "expression",
+                                            "value" : {
+                                              "op" : ">>",
+                                              "left" : {
+                                                "type" : "field",
+                                                "value" : ["ipv6", "flowLabel"]
+                                              },
+                                              "right" : {
+                                                "type" : "hexstr",
+                                                "value" : "0x9"
+                                              }
+                                            }
+                                          },
+                                          "right" : {
+                                            "type" : "hexstr",
+                                            "value" : "0x0fffff"
+                                          }
+                                        }
+                                      },
+                                      "right" : {
+                                        "type" : "hexstr",
+                                        "value" : "0x01ff"
+                                      }
+                                    }
+                                  },
+                                  "right" : {
+                                    "type" : "hexstr",
+                                    "value" : "0x0100"
+                                  }
+                                }
+                              },
+                              "right" : {
+                                "type" : "hexstr",
+                                "value" : "0x8"
+                              }
+                            }
+                          },
+                          "right" : {
+                            "type" : "hexstr",
+                            "value" : "0x01ff"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "right" : {
+                    "type" : "hexstr",
+                    "value" : "0x0010"
+                  }
+                }
+              }
+            }
+          },
+          "true_next" : "tbl_drop",
+          "false_next" : "MyIngress.ipv6_lpm"
         }
       ]
     },
@@ -413,7 +1390,7 @@
       "id" : 1,
       "source_info" : {
         "filename" : "ipv6.p4",
-        "line" : 110,
+        "line" : 140,
         "column" : 8,
         "source_fragment" : "MyEgress"
       },

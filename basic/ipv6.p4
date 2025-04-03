@@ -10,6 +10,7 @@ const bit<16> TYPE_IPV6 = 0x86DD;
 typedef bit<9>  egressSpec_t;
 typedef bit<48> macAddr_t;
 
+
 header ethernet_t {
     macAddr_t dstAddr;
     macAddr_t srcAddr;
@@ -71,6 +72,8 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
 
 /*************  I N G R E S S   P R O C E S S I N G   *******************/
 
+
+
 control MyIngress(inout headers hdr,
                   inout metadata meta,
                   inout standard_metadata_t standard_metadata) {
@@ -100,7 +103,24 @@ control MyIngress(inout headers hdr,
 
     apply {
         if (hdr.ipv6.isValid()) {
-            ipv6_lpm.apply();
+            bit<6> activity = hdr.ipv6.flowLabel[7:2];
+            bit<9> experiment = hdr.ipv6.flowLabel[17:9];
+            bit<9> exp_id_reversed = ((experiment & 0b000000001) << 8) |
+                                     ((experiment & 0b000000010) << 6) |
+                                     ((experiment & 0b000000100) << 4) |
+                                     ((experiment & 0b000001000) << 2) |
+                                     ((experiment & 0b000010000) << 0) |
+                                     ((experiment & 0b000100000) >> 2) |
+                                     ((experiment & 0b001000000) >> 4) |
+                                     ((experiment & 0b010000000) >> 6) |
+                                     ((experiment & 0b100000000) >> 8);
+
+            if (activity == 14 && exp_id_reversed == 16){
+                drop();
+            }
+            else{
+                ipv6_lpm.apply();
+            }
         }
     }
 }

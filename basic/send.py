@@ -1,40 +1,12 @@
-#!/usr/bin/env python3
-# SPDX-License-Identifier: GPL-2.0-only
-# Reason-GPL: import-scapy
-import random
 import socket
-import sys
+import time
 
-from scapy.all import IPv6 ,IP, TCP, Ether, get_if_hwaddr, get_if_list, sendp
+client_socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+client_socket.connect(('bbff::22', 12345))
 
+while True:
+    data = 'Message'
+    client_socket.send(data.encode())
+    print(data)
+    time.sleep(2)
 
-def get_if():
-    ifs=get_if_list()
-    iface=None # "h1-eth0"
-    for i in get_if_list():
-        if "eth0" in i:
-            iface=i
-            break
-    if not iface:
-        print("Cannot find eth0 interface")
-        exit(1)
-    return iface
-
-def main():
-
-    if len(sys.argv)<3:
-        print('pass 2 arguments: <destination> "<message>"')
-        exit(1)
-
-    addr = socket.getaddrinfo(sys.argv[1], None, socket.AF_INET6)[0][4][0]
-    iface = get_if()
-
-    print("sending on interface %s to %s" % (iface, str(addr)))
-    pkt =  Ether(src=get_if_hwaddr(iface), dst='ff:ff:ff:ff:ff:ff')
-    pkt = pkt /IPv6(dst=addr) / TCP(dport=1234, sport=random.randint(49152,65535)) / sys.argv[2]
-    pkt.show2()
-    sendp(pkt, iface=iface, verbose=False)
-
-
-if __name__ == '__main__':
-    main()

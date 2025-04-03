@@ -1,5 +1,19 @@
 # Scitags-with-P4
 
+## 20250403
+
+- Can not match scitags with runtime setting.
+
+- Slicing flowlabel bits into activity and experiment. **(In P4, bit slicing is calculated from right to left)** Reversing experiment bits by bit shifting due to scitags' rule.
+
+- Using if-statement to determine the given scitags.(Would like to look for alternative flexible methods.)
+
+- Modifying send.py and receive.py to transmit data in TCP connection.
+
+### Monitoring in Grafana
+we can find that packets with specific scitags(activity:14, experiment:16) is transmited by h1 and h2 do not receive them. Others can received by h2.
+![image](./image/DropPacket.png)
+
 ## 20250320
 
 - Monitor the packets sent and received by the host with Prometheus in FlowLabel_Exporter.py
@@ -14,10 +28,11 @@
 ```
 # start prometheus in port 9000
 sudo prometheus --config.file=/etc/prometheus/prometheus.yml --web.listen-address=:9000
-sudo python3 FlowLabel_Exporter.py
+sudo python3 scitags/FlowLabel_Exporter.py
 
 # start grafana
-/usr/local/grafana/bin ./grafana-server &
+in /usr/local/grafana/bin
+    ./grafana-server &
 
 # enter host's command line
 sudo mnexec -a $(pgrep -f "mininet:h1") bash

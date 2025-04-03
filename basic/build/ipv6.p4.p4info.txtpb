@@ -62,5 +62,57 @@ actions {
     bitwidth: 9
   }
 }
+actions {
+  preamble {
+    id: 31994061
+    name: "MyIngress.store_flow_label"
+    alias: "store_flow_label"
+  }
+}
+registers {
+  preamble {
+    id: 379461849
+    name: "activity_reg"
+    alias: "activity_reg"
+  }
+  type_spec {
+    bitstring {
+      bit {
+        bitwidth: 6
+      }
+    }
+  }
+  size: 1
+}
+registers {
+  preamble {
+    id: 375540604
+    name: "experiment_reg"
+    alias: "experiment_reg"
+  }
+  type_spec {
+    bitstring {
+      bit {
+        bitwidth: 9
+      }
+    }
+  }
+  size: 1
+}
+registers {
+  preamble {
+    id: 382751721
+    name: "flow_label_reg"
+    alias: "flow_label_reg"
+  }
+  type_spec {
+    bitstring {
+      bit {
+        bitwidth: 20
+      }
+    }
+  }
+  size: 1
+}
 type_info {
 }
