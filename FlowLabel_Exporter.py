@@ -1,5 +1,11 @@
 from scapy.all import sniff, IPv6
 from prometheus_client import start_http_server, Gauge
+import time
+import threading
+from collections import defaultdict
+
+packet_timestamps = defaultdict(list)
+packet_counts = {}
 
 ipv6_gauges_transmitting = {}
 ipv6_gauges_receiving = {}
@@ -7,8 +13,10 @@ ipv6_gauges_receiving = {}
 monitoring_ips = {
     "s1-eth1": "bbff::11",
     "s1-eth2": "bbff::22",
-    "s1-eth3": "bbff::33",
+    "s1-eth3": "aadd::11",
 }
+
+TIME_WINDOW = 15.0
 
 def get_gauge(interface, direction):
     if direction == "transmitting":
@@ -42,8 +50,8 @@ def packet_callback(packet):
         monitoring_ip = monitoring_ips[iface]
 
         label = str(bin(flow_label))[2:].zfill(20)
-        activity = int(label[11:18], 2)
-        experiment = int(label[2:12][::-1], 2)
+        activity = int(label[12:18], 2)
+        experiment = int(label[2:11][::-1], 2)
         scitags = f"{activity} {experiment}"
 
         if src_ip == monitoring_ip:
@@ -57,11 +65,32 @@ def packet_callback(packet):
 
         gauge = get_gauge(iface, direction)
 
-        if scitags == "14 16":
-            gauge.labels(src=src_ip, dst=dst_ip, scitags=scitags).set(flow_label)
-        else:
-            gauge.labels(src=src_ip, dst=dst_ip, scitags="others").set(flow_label)
+        scitags_label = scitags if scitags == "14 16" else "others"
+        
+        count_key = (iface, direction, src_ip, dst_ip, scitags_label)
+        packet_timestamps[count_key].append(time.time())
 
+def update_metrics():
+    while True:
+        current_time = time.time()
+
+        for count_key in list(packet_timestamps.keys()):
+            iface, direction, src_ip, dst_ip, scitags_label = count_key
+
+            packet_timestamps[count_key] = [
+                ts for ts in packet_timestamps[count_key] if current_time - ts <= TIME_WINDOW
+            ]
+
+            packet_count = len(packet_timestamps[count_key])
+
+            packet_counts[count_key] = packet_count
+
+            gauge = get_gauge(iface, direction)
+            gauge.labels(src=src_ip, dst=dst_ip, scitags=scitags_label).set(packet_count)
+
+        time.sleep(TIME_WINDOW)
+
+threading.Thread(target=update_metrics, daemon=True).start()
 start_http_server(9101)
 
 print("Listening...")

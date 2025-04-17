@@ -1,43 +1,46 @@
 {
     "hosts": {
         "h1": {
-            "ip": "172.16.1.1/24",
+            "ip": "172.81.1.1/24",
             "mac": "08:00:00:00:01:11",
             "commands": [
-                "route add default gw 172.16.1.10 dev eth0",
-                "arp -i eth0 -s 172.16.1.10 08:00:00:00:01:00",
+                "route add default gw 172.81.1.10 dev eth0",
+                "arp -i eth0 -s 172.81.1.10 08:00:00:00:01:00",
                 "sysctl -w net.ipv6.conf.lo.disable_ipv6=0",
                 "sysctl -w net.ipv6.conf.eth0.disable_ipv6=0",
                 "ip address add bbff::11/64 dev eth0",
                 "ip -6 route add default via bbff::10 dev eth0",
+                "ip -6 route add aadd::/64 dev eth0",
                 "ip -6 neigh add bbff::22 lladdr 08:00:00:00:02:22 dev eth0",
-                "ip -6 neigh add bbff::33 lladdr 08:00:00:00:03:33 dev eth0"
+                "ip -6 neigh add aadd::11 lladdr 04:00:00:00:01:11 dev eth0"
             ]
         },
         "h2": {
-            "ip": "172.16.2.2/24",
+            "ip": "172.81.2.2/24",
             "mac": "08:00:00:00:02:22",
             "commands": [
-                "route add default gw 172.16.2.20 dev eth0",
-                "arp -i eth0 -s 172.16.2.20 08:00:00:00:02:00",
+                "route add default gw 172.81.2.20 dev eth0",
+                "arp -i eth0 -s 172.81.2.20 08:00:00:00:02:00",
                 "sysctl -w net.ipv6.conf.lo.disable_ipv6=0",
                 "sysctl -w net.ipv6.conf.eth0.disable_ipv6=0",
                 "ip addr add bbff::22/64 dev eth0",
                 "ip -6 route add default via bbff::20 dev eth0",
+                "ip -6 route add aadd::/64 dev eth0",
                 "ip -6 neigh add bbff::11 lladdr 08:00:00:00:01:11 dev eth0",
-                "ip -6 neigh add bbff::33 lladdr 08:00:00:00:03:33 dev eth0"
+                "ip -6 neigh add aadd::11 lladdr 04:00:00:00:01:11 dev eth0"
             ]
         },
         "h3": {
-            "ip": "172.16.3.3/24",
-            "mac": "08:00:00:00:03:33",
+            "ip": "200.16.1.1/24",
+            "mac": "04:00:00:00:01:11",
             "commands": [
-                "route add default gw 172.16.3.30 dev eth0",
-                "arp -i eth0 -s 172.16.3.30 08:00:00:00:03:00",
+                "route add default gw 200.16.1.10 dev eth0",
+                "arp -i eth0 -s 200.16.1.10 04:00:00:00:01:00",
                 "sysctl -w net.ipv6.conf.lo.disable_ipv6=0",
                 "sysctl -w net.ipv6.conf.eth0.disable_ipv6=0",
-                "ip addr add bbff::33/64 dev eth0",
-                "ip -6 route add default via bbff::30 dev eth0",
+                "ip addr add aadd::11/64 dev eth0",
+                "ip -6 route add default via aadd::10 dev eth0",
+                "ip -6 route add bbff::/64 dev eth0",
                 "ip -6 neigh add bbff::11 lladdr 08:00:00:00:01:11 dev eth0",
                 "ip -6 neigh add bbff::22 lladdr 08:00:00:00:02:22 dev eth0"
             ]

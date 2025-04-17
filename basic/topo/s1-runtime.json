@@ -34,13 +34,40 @@
     {
       "table": "MyIngress.ipv6_lpm",
       "match": {
-        "hdr.ipv6.dstAddr": ["bbff::33", 128]
+        "hdr.ipv6.dstAddr": ["aadd::11", 128]
       },
       "action_name": "MyIngress.ipv6_forward",
       "action_params": {
-        "dstAddr": "08:00:00:00:03:33",
+        "dstAddr": "04:00:00:00:01:11",
         "port": 3
       }
+    },
+    {
+      "table": "MyIngress.flow_filter",
+      "match": {
+        "hdr.ipv6.flowLabel[7:2]": 14,
+        "meta.exp_id_reversed": 16
+      },
+      "action_name": "NoAction",
+      "action_params": {}
+    },
+    {
+      "table": "MyIngress.dst_port_filter",
+      "match": {
+        "hdr.ipv6.dstAddr": ["bbff::", 64],
+        "standard_metadata.egress_spec": 1
+      },
+      "action_name": "NoAction",
+      "action_params": {}
+    },
+    {
+      "table": "MyIngress.dst_port_filter",
+      "match": {
+        "hdr.ipv6.dstAddr": ["bbff::", 64],
+        "standard_metadata.egress_spec": 2
+      },
+      "action_name": "NoAction",
+      "action_params": {}
     }
   ]
 }

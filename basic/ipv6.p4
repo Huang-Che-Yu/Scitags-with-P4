@@ -28,8 +28,10 @@ header ipv6_t {
     bit<128>  dstAddr;
 }
 
+
 struct metadata {
     /* empty */
+    bit<9> exp_id_reversed; // 新增用於儲存反轉後的 exp_id
 }
 
 struct headers {
@@ -101,9 +103,33 @@ control MyIngress(inout headers hdr,
         default_action = drop();
     }
 
+    table dst_port_filter {
+        key = {
+            hdr.ipv6.dstAddr: lpm;
+            standard_metadata.egress_spec: exact;
+        }
+        actions = {
+            drop;
+            NoAction;
+        }
+        size = 512;
+        default_action = drop();
+    }
+
+    table flow_filter {
+        key = {
+            hdr.ipv6.flowLabel[7:2]: exact;
+            meta.exp_id_reversed: exact;
+        }
+        actions = {
+            NoAction;
+        }
+        size = 512;
+        default_action = NoAction();
+    }
+
     apply {
         if (hdr.ipv6.isValid()) {
-            bit<6> activity = hdr.ipv6.flowLabel[7:2];
             bit<9> experiment = hdr.ipv6.flowLabel[17:9];
             bit<9> exp_id_reversed = ((experiment & 0b000000001) << 8) |
                                      ((experiment & 0b000000010) << 6) |
@@ -114,12 +140,12 @@ control MyIngress(inout headers hdr,
                                      ((experiment & 0b001000000) >> 4) |
                                      ((experiment & 0b010000000) >> 6) |
                                      ((experiment & 0b100000000) >> 8);
+            
+            meta.exp_id_reversed = exp_id_reversed;
 
-            if (activity == 14 && exp_id_reversed == 16){
-                drop();
-            }
-            else{
-                ipv6_lpm.apply();
+            ipv6_lpm.apply();
+            if(flow_filter.apply().hit){
+                dst_port_filter.apply();
             }
         }
     }

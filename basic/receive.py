@@ -1,7 +1,7 @@
 import socket
 
 server_socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-server_socket.bind(('bbff::22', 12345))
+server_socket.bind(('bbff::11', 12345))
 server_socket.listen(5)
 
 print("Server listening on port 12345...")

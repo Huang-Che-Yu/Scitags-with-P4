@@ -1,5 +1,44 @@
 # Scitags-with-P4
 
+## 20250417
+
+- Change the topology configuration to distinguish internet and intranet
+
+    intranet host h1: bbff:11, h2 bbff:22
+
+    internet host h3: aadd::11
+
+- Add the `flow_filter` to match the scitags in runtime. After match the specificed scitags flow, use the `dst_port_filter` to check whether the destination of the forwarded packet is the intranet. If it is not, drop the packet.
+
+- Fix the FlowLabel_Exporter. 
+    1. Record the timestamp of each packet and count the number of packets within a fixed time window, then upload the result to Prometheus. 
+    2. Ensure the uploaded data is the total number of packets within 15 seconds, with the unit being packet count. 
+    3. Use a timer or background thread to periodically calculate and update the Prometheus metric, ensuring it reflects the latest per-second packet count.
+
+### h2 (intranet host) and h3 (internet host) request video file from h1
+
+In the test, the video size is 80.2MB (80170781 bytes)
+
+```
+h1> python3 -m http.server 8000 --bind bbff::11
+h2> curl -6 http://[bbff::11]:8000/video.mp4 -o h2_received_video.mp4
+h3> curl -6 http://[bbff::11]:8000/video.mp4 -o h3_received_video.mp4
+```
+
+After testing, h2 successfully received the entire file (80.2MB, 80170781 bytes), while h3 only received a small portion of it (372.9KB, 372796 bytes)
+
+This method can prevent larger files, such as video files, from being fully leaked. However, smaller files like text files, may still be leaked to the internet. The reason is that flowd takes time to detect a TCP connection and mark the packets, so some packets may be sent out before being marked.
+
+The test results roughly meet the objectives specified in the prompt.
+
+#### Monitoring in Grafana
+
+h2 requests a video file from h1, and it can be seen that h1 forwards the packet with the specified scitags to h2 within the intranet.
+![alt text](./image/h2Transmitting.png) 
+
+h3 requests a video file from h1. It can be observed that h1 sends out packets with the specified scitags, but h3 does not receive any packets containing the specified scitags.
+![alt text](./image/h3Transmitting.png)
+
 ## 20250403
 
 - Can not match scitags with runtime setting.
@@ -30,7 +69,7 @@ we can find that packets with specific scitags(activity:14, experiment:16) is tr
 sudo prometheus --config.file=/etc/prometheus/prometheus.yml --web.listen-address=:9000
 sudo python3 scitags/FlowLabel_Exporter.py
 
-# start grafana
+# start grafana (username: admin, password: admin)
 in /usr/local/grafana/bin
     ./grafana-server &
 

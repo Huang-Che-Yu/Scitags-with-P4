@@ -30,6 +30,61 @@ tables {
   }
   size: 1024
 }
+tables {
+  preamble {
+    id: 35288379
+    name: "MyIngress.dst_port_filter"
+    alias: "dst_port_filter"
+  }
+  match_fields {
+    id: 1
+    name: "hdr.ipv6.dstAddr"
+    bitwidth: 128
+    match_type: LPM
+  }
+  match_fields {
+    id: 2
+    name: "standard_metadata.egress_spec"
+    bitwidth: 9
+    match_type: EXACT
+  }
+  action_refs {
+    id: 25652968
+  }
+  action_refs {
+    id: 21257015
+  }
+  initial_default_action {
+    action_id: 25652968
+  }
+  size: 512
+}
+tables {
+  preamble {
+    id: 36839640
+    name: "MyIngress.flow_filter"
+    alias: "flow_filter"
+  }
+  match_fields {
+    id: 1
+    name: "hdr.ipv6.flowLabel[7:2]"
+    bitwidth: 6
+    match_type: EXACT
+  }
+  match_fields {
+    id: 2
+    name: "meta.exp_id_reversed"
+    bitwidth: 9
+    match_type: EXACT
+  }
+  action_refs {
+    id: 21257015
+  }
+  initial_default_action {
+    action_id: 21257015
+  }
+  size: 512
+}
 actions {
   preamble {
     id: 21257015
@@ -61,58 +116,6 @@ actions {
     name: "port"
     bitwidth: 9
   }
-}
-actions {
-  preamble {
-    id: 31994061
-    name: "MyIngress.store_flow_label"
-    alias: "store_flow_label"
-  }
-}
-registers {
-  preamble {
-    id: 379461849
-    name: "activity_reg"
-    alias: "activity_reg"
-  }
-  type_spec {
-    bitstring {
-      bit {
-        bitwidth: 6
-      }
-    }
-  }
-  size: 1
-}
-registers {
-  preamble {
-    id: 375540604
-    name: "experiment_reg"
-    alias: "experiment_reg"
-  }
-  type_spec {
-    bitstring {
-      bit {
-        bitwidth: 9
-      }
-    }
-  }
-  size: 1
-}
-registers {
-  preamble {
-    id: 382751721
-    name: "flow_label_reg"
-    alias: "flow_label_reg"
-  }
-  type_spec {
-    bitstring {
-      bit {
-        bitwidth: 20
-      }
-    }
-  }
-  size: 1
 }
 type_info {
 }
