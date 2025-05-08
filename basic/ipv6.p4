@@ -30,8 +30,7 @@ header ipv6_t {
 
 
 struct metadata {
-    /* empty */
-    bit<9> exp_id_reversed; // 新增用於儲存反轉後的 exp_id
+    bit<9> exp_id_reversed;
 }
 
 struct headers {

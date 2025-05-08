@@ -1,5 +1,13 @@
 # Scitags-with-P4
 
+## 20250509
+
+- Add setup.sh to simplify the process of launching Exporter, Prometheus, and Grafana.
+
+- Add enter_host.sh to simplify the process of entering hosts.
+
+- Add server.py. Before sending packets, introducing a two-second delay after establishing a TCP connection. This way can temporarily resolve the issue of some packets not being marked.
+
 ## 20250417
 
 - Change the topology configuration to distinguish internet and intranet
@@ -21,8 +29,8 @@ In the test, the video size is 80.2MB (80170781 bytes)
 
 ```
 h1> python3 -m http.server 8000 --bind bbff::11
-h2> curl -6 http://[bbff::11]:8000/video.mp4 -o h2_received_video.mp4
-h3> curl -6 http://[bbff::11]:8000/video.mp4 -o h3_received_video.mp4
+h2> curl -6 http://[bbff::11]:8000/h1/video.mp4 -o h2_video.mp4
+h3> curl -6 http://[bbff::11]:8000/h1/video.mp4 -o h3_video.mp4
 ```
 
 After testing, h2 successfully received the entire file (80.2MB, 80170781 bytes), while h3 only received a small portion of it (372.9KB, 372796 bytes)
