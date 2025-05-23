@@ -176,7 +176,7 @@
       "id" : 0,
       "source_info" : {
         "filename" : "ipv6.p4",
-        "line" : 175,
+        "line" : 173,
         "column" : 8,
         "source_fragment" : "MyDeparser"
       },
@@ -223,7 +223,7 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 83,
+            "line" : 82,
             "column" : 8,
             "source_fragment" : "mark_to_drop(standard_metadata)"
           }
@@ -245,7 +245,7 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 83,
+            "line" : 82,
             "column" : 8,
             "source_fragment" : "mark_to_drop(standard_metadata)"
           }
@@ -280,7 +280,7 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 87,
+            "line" : 86,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = port"
           }
@@ -299,7 +299,7 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 88,
+            "line" : 87,
             "column" : 8,
             "source_fragment" : "hdr.ethernet.srcAddr = hdr.ethernet.dstAddr"
           }
@@ -318,7 +318,7 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 89,
+            "line" : 88,
             "column" : 8,
             "source_fragment" : "hdr.ethernet.dstAddr = dstAddr"
           }
@@ -360,7 +360,7 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 90,
+            "line" : 89,
             "column" : 8,
             "source_fragment" : "hdr.ipv6.hopLimit = hdr.ipv6.hopLimit - 1"
           }
@@ -368,7 +368,7 @@
       ]
     },
     {
-      "name" : "ipv6l145",
+      "name" : "ipv6l143",
       "id" : 6,
       "runtime_data" : [],
       "primitives" : [
@@ -989,7 +989,7 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 145,
+            "line" : 143,
             "column" : 12,
             "source_fragment" : "meta.exp_id_reversed = exp_id_reversed"
           }
@@ -997,7 +997,7 @@
       ]
     },
     {
-      "name" : "ipv6l121",
+      "name" : "ipv6l120",
       "id" : 7,
       "runtime_data" : [],
       "primitives" : [
@@ -1048,7 +1048,7 @@
           ],
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 121,
+            "line" : 120,
             "column" : 12,
             "source_fragment" : "hdr.ipv6.flowLabel[7:2]"
           }
@@ -1062,18 +1062,18 @@
       "id" : 0,
       "source_info" : {
         "filename" : "ipv6.p4",
-        "line" : 79,
+        "line" : 78,
         "column" : 8,
         "source_fragment" : "MyIngress"
       },
       "init_table" : "node_2",
       "tables" : [
         {
-          "name" : "tbl_ipv6l145",
+          "name" : "tbl_ipv6l143",
           "id" : 0,
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 145,
+            "line" : 143,
             "column" : 33,
             "source_fragment" : "="
           },
@@ -1085,10 +1085,10 @@
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [6],
-          "actions" : ["ipv6l145"],
+          "actions" : ["ipv6l143"],
           "base_default_next" : "MyIngress.ipv6_lpm",
           "next_tables" : {
-            "ipv6l145" : "MyIngress.ipv6_lpm"
+            "ipv6l143" : "MyIngress.ipv6_lpm"
           },
           "default_entry" : {
             "action_id" : 6,
@@ -1102,7 +1102,7 @@
           "id" : 1,
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 93,
+            "line" : 92,
             "column" : 10,
             "source_fragment" : "ipv6_lpm"
           },
@@ -1122,11 +1122,11 @@
           "direct_meters" : null,
           "action_ids" : [5, 3, 0],
           "actions" : ["MyIngress.ipv6_forward", "MyIngress.drop", "NoAction"],
-          "base_default_next" : "tbl_ipv6l121",
+          "base_default_next" : "tbl_ipv6l120",
           "next_tables" : {
-            "MyIngress.ipv6_forward" : "tbl_ipv6l121",
-            "MyIngress.drop" : "tbl_ipv6l121",
-            "NoAction" : "tbl_ipv6l121"
+            "MyIngress.ipv6_forward" : "tbl_ipv6l120",
+            "MyIngress.drop" : "tbl_ipv6l120",
+            "NoAction" : "tbl_ipv6l120"
           },
           "default_entry" : {
             "action_id" : 3,
@@ -1136,11 +1136,11 @@
           }
         },
         {
-          "name" : "tbl_ipv6l121",
+          "name" : "tbl_ipv6l120",
           "id" : 2,
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 121,
+            "line" : 120,
             "column" : 12,
             "source_fragment" : "hdr.ipv6.flowLabel[7:2]"
           },
@@ -1152,10 +1152,10 @@
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [7],
-          "actions" : ["ipv6l121"],
+          "actions" : ["ipv6l120"],
           "base_default_next" : "MyIngress.flow_filter",
           "next_tables" : {
-            "ipv6l121" : "MyIngress.flow_filter"
+            "ipv6l120" : "MyIngress.flow_filter"
           },
           "default_entry" : {
             "action_id" : 7,
@@ -1169,7 +1169,7 @@
           "id" : 3,
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 119,
+            "line" : 118,
             "column" : 10,
             "source_fragment" : "flow_filter"
           },
@@ -1212,7 +1212,7 @@
           "id" : 4,
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 106,
+            "line" : 105,
             "column" : 10,
             "source_fragment" : "dst_port_filter"
           },
@@ -1258,7 +1258,7 @@
           "id" : 0,
           "source_info" : {
             "filename" : "ipv6.p4",
-            "line" : 132,
+            "line" : 131,
             "column" : 12,
             "source_fragment" : "hdr.ipv6.isValid()"
           },
@@ -1274,7 +1274,7 @@
             }
           },
           "false_next" : null,
-          "true_next" : "tbl_ipv6l145"
+          "true_next" : "tbl_ipv6l143"
         }
       ]
     },
@@ -1283,7 +1283,7 @@
       "id" : 1,
       "source_info" : {
         "filename" : "ipv6.p4",
-        "line" : 157,
+        "line" : 155,
         "column" : 8,
         "source_fragment" : "MyEgress"
       },

@@ -10,13 +10,13 @@ logger = logging.getLogger(__name__)
 class HTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     seen_connections = set()
 
-    def GET(self):
+    def do_GET(self):
         client_key = (self.client_address[0], self.client_address[1])
         logger.info(f"Received GET request from {client_key} for {self.path}")
 
         if client_key not in self.seen_connections:
-            logger.info(f"New connection from {client_key}, applying 1-second delay")
-            time.sleep(2)
+            logger.info(f"New connection from {client_key}, applying 3-second delay")
+            time.sleep(3)
             self.seen_connections.add(client_key)
         else:
             logger.info(f"Existing connection from {client_key}, no delay")
@@ -28,7 +28,7 @@ class HTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
 class IPv6TCPServer(socketserver.TCPServer):
-
+    address_family = socket.AF_INET6
     def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True):
         super().__init__(server_address, RequestHandlerClass, bind_and_activate)
         logger.info(f"Server initialized, binding to {server_address}")
